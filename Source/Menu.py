@@ -5,7 +5,7 @@ from os import get_terminal_size
 class Menu:
     terminal_height = get_terminal_size().lines
     selected_option = "Help"
-    content = "oi\ncomoestás?"
+    content = "GBAtemp CLI help screen"
 
     def __init__(self):
         print("\033[H\033[J") # Cleaning the console
