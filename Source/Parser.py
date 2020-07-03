@@ -8,9 +8,8 @@ class Page:
 
     def get(self):
 
-        if self.page_type == "home":
-            parsed = "\nGBAtemp - HomePage\n\n\n"
-            parsed += "Site & Scene News\n\n"
+        if self.page_type == "News":
+            parsed = "\nGBAtemp - Site & Scene News\n\n\n"
 
             toparse = requests.get("https://gbatemp.net/").content
             toparse = BeautifulSoup(toparse, "html.parser")
@@ -37,12 +36,9 @@ class Page:
                             authors_list.append(tag.get_text())
                         
             for i in range(0,len(news_list)):
-                parsed += news_list[i] + "\n"
-                parsed += dates_list[i] + "\n"
-                parsed += "by " + authors_list[i] + " - " + comment_number_list[i].replace("\n","") + " Comments\n\n"
+                parsed += "  " + news_list[i] + "\n"
+                parsed += "  " + dates_list[i] + "\n"
+                parsed += "  " + "by " + authors_list[i] + " - " + comment_number_list[i].replace("\n","") + " Comments\n\n\n"
             
             return parsed
-
-        
-
-
+    
