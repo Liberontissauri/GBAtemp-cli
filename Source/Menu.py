@@ -26,7 +26,7 @@ class Menu:
     
     def news(self):
         self.content = Parser.Page("https://gbatemp.net/","News")
-        self.content = self.content.get()
+        self.content = self.content.getnews()
         self.selected_option = "News"
         self.__init__()
 
