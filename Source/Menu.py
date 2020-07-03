@@ -7,6 +7,7 @@ class Menu:
     terminal_height = get_terminal_size().lines
     selected_option = "Help"
     content = "GBAtemp CLI help screen"
+    links = []
 
     def __init__(self):
         print("\033[H\033[J") # Cleaning the console
@@ -25,8 +26,8 @@ class Menu:
             option_dict[userinput]()
     
     def news(self):
-        self.content = Parser.Page("https://gbatemp.net/","News")
-        self.content = self.content.getnews()
+        self.content = Parser.Page()
+        self.content, self.links = self.content.getnews(1)
         self.selected_option = "News"
         self.__init__()
 

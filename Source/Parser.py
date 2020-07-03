@@ -1,43 +1,43 @@
 import requests
 from bs4 import BeautifulSoup
+from time import sleep
+from os import get_terminal_size
 
 class Page:
-    def __init__(self, current_page, page_type):
-        self.current_page = current_page
-        self.page_type = page_type
+    def getnews(self,pagenum):
 
-    def getnews(self):
+        parsed = "-"*get_terminal_size().columns+"\nGBAtemp - Site & Scene News - Page 1\n\n\n\n"
 
-        parsed = "\nGBAtemp - Site & Scene News\n\n\n"
-
-        toparse = requests.get("https://gbatemp.net/").content
+        toparse = requests.get("https://gbatemp.net/forums/gbatemp-scene-news.101/page-{}".format(pagenum)).content
         toparse = BeautifulSoup(toparse, "html.parser")
 
-        news_list_unparsed = toparse.findAll("li",{"class":"news_item full"})
+        news_list_unparsed = toparse.findAll("div",{"class":"titleText"})
 
-        news_list = []
+        news_names_list = []
         comment_number_list = []
         dates_list = []
         authors_list = []
+        links_list = []
 
-        for news in news_list_unparsed:
-            counter = 0
-            for tag in news.findAll("a"):
-                if tag.get_text() != "":
-                    counter += 1
-                    if counter == 1:
-                        news_list.append(tag.get_text())
-                    elif counter == 2:
-                        comment_number_list.append(tag.get_text().replace("	",""))
-                    elif counter == 3:
-                        dates_list.append(tag.get_text())
-                    elif counter == 4:
-                        authors_list.append(tag.get_text())
-                    
-        for i in range(0,len(news_list)):
-            parsed += "  " + news_list[i] + "\n"
-            parsed += "  " + dates_list[i] + "\n"
-            parsed += "  " + "by " + authors_list[i] + " - " + comment_number_list[i].replace("\n","") + " Comments\n\n\n"
+        for new in news_list_unparsed:
+            if new.find("a",{"class":"PreviewTooltip"}) is not None:
+                news_names_list.append(new.find("a",{"class":"PreviewTooltip"}).get_text())
+                links_list.append("https://gbatemp.net/"+new.find("a",{"class":"PreviewTooltip"}).get("href"))
+            if new.find("a",{"class":"username"}) is not None:
+                authors_list.append(new.find("a",{"class":"username"}).get_text())
+            if new.find("span",{"class":"DateTime"}) is not None:
+                dates_list.append(new.find("span",{"class":"DateTime"}).get_text())
+            elif new.find("abbr",{"class":"DateTime"}) is not None:
+                dates_list.append(new.find("abbr",{"class":"DateTime"}).get("data-datestring"))
+
+        for block in toparse.findAll("dl",{"class":"major"}):
+            if block.find("dd") is not None:
+                comment_number_list.append(block.find("dd").get_text())
         
-        return parsed
-    
+        for i in range(0,len(news_names_list)):
+            parsed += "      " + news_names_list[i] + "\n"
+            parsed += " {} - ".format(str(i)) + dates_list[i] + "\n"
+            parsed += "      " + "by " + authors_list[i] + " - " + comment_number_list[i].replace("\n","") + " Comments\n\n\n"
+            
+
+        return parsed, links_list
