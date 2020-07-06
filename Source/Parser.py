@@ -1,12 +1,12 @@
 import requests
-from bs4 import BeautifulSoup
-from time import sleep
+from bs4 import BeautifulSoup, NavigableString
+
 from os import get_terminal_size
 
 class Page:
-    def getnews(self,pagenum):
+    def get_news(self,pagenum):
 
-        parsed = "-"*get_terminal_size().columns+"\nGBAtemp - Site & Scene News - Page 1\n\n\n\n"
+        parsed = "-"*get_terminal_size().columns+"\nGBAtemp - Site & Scene News - Page 1\n\n"
 
         toparse = requests.get("https://gbatemp.net/forums/gbatemp-scene-news.101/page-{}".format(pagenum)).content
         toparse = BeautifulSoup(toparse, "html.parser")
@@ -41,3 +41,49 @@ class Page:
             
 
         return parsed, links_list
+
+    def get_news_article(self,url):
+        toparse = requests.get(url).content
+        toparse = BeautifulSoup(toparse, "html.parser")
+        title = ""
+        for tag in toparse.findAll("a",{"id":"threadTitle"}):
+            if tag != None:
+                title = tag.get_text()
+                break
+
+        parsed = "-"*get_terminal_size().columns+"\nGBAtemp - {} - Page 1\n\n".format(title)
+
+        header_len = len("GBAtemp - {} - Page 1".format(title))
+
+        current_paragraph = ""
+
+        paragraphs = []
+
+        for element in toparse.find("blockquote",{"class":"messageText SelectQuoteContainer ugc baseHtml"}):
+            current_paragraph = str(element).replace("\n", "")
+            current_paragraph = current_paragraph.replace("\t","")
+            if type(element) is NavigableString and len(current_paragraph)!=0:
+                paragraphs.append(current_paragraph)
+        
+        for paragraph in paragraphs:
+            parsed+="\n "
+            letter_counter = 0
+            for letter in paragraph:
+                if letter_counter >= header_len and letter == " ":
+                    parsed += "\n"
+                    letter_counter = 0
+                parsed += letter
+                letter_counter += 1
+                
+                
+
+
+        return parsed
+
+    def gopage(self,type,path):
+        pagefunctions = {
+
+            "News":self.get_news_article
+        }
+        pagefunctions[type](path)
+        
