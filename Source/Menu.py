@@ -2,7 +2,6 @@
 from prompt_toolkit import prompt
 from os import get_terminal_size
 import Parser
-from time import sleep
 
 class Menu:
     terminal_height = get_terminal_size().lines
