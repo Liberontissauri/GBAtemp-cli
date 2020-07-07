@@ -7,6 +7,7 @@ class Menu:
     terminal_height = get_terminal_size().lines
     selected_option = "Help"
     content = "\nGBAtemp CLI help screen"
+    arguments = ""
     links = []
 
     def __init__(self):
@@ -16,38 +17,41 @@ class Menu:
 
         userinput = prompt("\n" + " {} >> ".format(self.selected_option)) # Creating and displaying command prompt
         
-        if " " in userinput:
-            arguments = userinput[userinput.find(" "):]
+        if " " in userinput: # Verifying the presence of arguments in user input
+            self.arguments = userinput[userinput.find(" "):]
             userinput = userinput[:userinput.find(" ")]
 
-        option_dict = {
+        option_dict = { # Possible options for user input (takes userinput to find the correct option)
             "news":self.news,
             "exit":self.close,
-            "go":None
+            "go":None # The go option will be executed later since it behaves differently depending on the page.
             
         }
-        go_options_dict = {
+        go_options_dict = { # Dictionary to hold the possible usages of the go function (uses the selected option to find the correct option)
             "News":self.newsarticle
 
         }
         
-        if userinput not in option_dict:
+        if userinput not in option_dict: # Verifying if the user input is valid
             self.__init__()
         elif userinput == "go":
-            
-            go_options_dict[self.selected_option](arguments)
-        else:
+            go_options_dict[self.selected_option]()
+
+        else: # The user input is a normal command (unlike go)
             option_dict[userinput]()
     
     def news(self):
         self.content = Parser.Page()
-        self.content, self.links = self.content.get_news(1)
+        try: # Verifying if there is an valid argument for news
+            self.content, self.links = self.content.get_news(int(self.arguments))
+        except ValueError: # Using default value 1 for argument if no valid argument is given
+            self.content, self.links = self.content.get_news(1)
         self.selected_option = "News"
         self.__init__()
 
-    def newsarticle(self,arguments):
+    def newsarticle(self):
         self.content = Parser.Page()
-        self.content = self.content.get_news_article(self.links[int(arguments)])
+        self.content = self.content.get_news_article(self.links[int(self.arguments)])
         self.__init__()
 
     def close(self):

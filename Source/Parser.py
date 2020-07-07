@@ -6,7 +6,7 @@ from os import get_terminal_size
 class Page:
     def get_news(self,pagenum):
 
-        parsed = "-"*get_terminal_size().columns+"\nGBAtemp - Site & Scene News - Page 1\n\n"
+        parsed = "-"*get_terminal_size().columns+"\nGBAtemp - Site & Scene News - Page {}\n\n".format(pagenum)
 
         toparse = requests.get("https://gbatemp.net/forums/gbatemp-scene-news.101/page-{}".format(pagenum)).content
         toparse = BeautifulSoup(toparse, "html.parser")
